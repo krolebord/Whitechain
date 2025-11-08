@@ -1,80 +1,130 @@
-Whitechain
-Введення
-Дане тестове завдання було підготовлено компанією WhiteBIT для студентів
-університету НаУКМА. Це завдання дає змогу компанії оцінити аналітичні,
-технічні та архітектурні навички кандидатів.
-Вимоги до коду
-Код має бути виконаний на версії Solidity = 0.8.24, також він має бути
-задеплоєний і верифікований у мережу Whitechain Testnet.
-Має бути 100% покриття тестами свого контракту, і задеплоєно за
-допомогою Hardhat або Foundry, скрипти мають бути написані на TypeScript. 
-Коментарі до коду мають відповідати формату natSpec. 
-Має бути доданий README файл з адресами задеплоєних контрактів, на ньому мають бути
-виконані крафт речей, і всі інструкції для того, щоб задеплоїти проєкт. 
-Посилання на pull request викласти на Distedu.
-Використання таких бібліотек є необов’язковим, та за
-бажанням студента:
-UUPSUpgradeable
-Initializable
-AccessControl
-Та й інші
-Завдання: Гра “Козацький бізнес”
-У грі існує 6 базових ресурсів NFT1155:
-• Дерево (Wood)
-• Залізо (Iron)
-• Золото (Gold)
-• Шкіра (Leather)
-• Камінь (Stone)
-• Алмаз (Diamond)
-Гравці можуть об’єднувати ресурси та створювати унікальні предмети NFT721:
-1. Шабля козака
-• 3× Залізо
-• 1× Дерево
-• 1× Шкіра
-2. Посох старійшини
-• 2× Дерево
-• 1× Золото
-• 1× Алмаз
-3. Броня характерника (не обовʼязково)
-• 4× Шкіра
-• 2× Залізо
-• 1× Золото
-4. Бойовий браслет (не обовʼязково)
-• 4× Залізо
-• 2× Золото
-• 2× Алмаз
-Механіка NFT-1155 / NFT721:
-Створення NFT можливе лише через контракти Crafting або Search.
-Пряме створення або спалення NFT через базові контракти ResourceNFT1155 та
-ItemNFT721 — заборонене.
-Спалення NFT можливе тільки під час продажу предметів у контракті Marketplace.
-Механіка MagicToken (ERC20):
-Токени MagicToken можна отримати лише через продаж предметів у контракті
-Marketplace.
-Пряме мінтинг токенів через контракт MagicToken заборонений. Мінт викликається
-виключно з Marketplace.
-Отримані MagicToken надходять на гаманець гравця після успішного продажу
-предмета.
-Механіка Crafting / Search:
-Гравець може запускати пошук ресурсів раз на 60 секунд.
-Пошук генерує 3 випадкових ресурси (ResourceNFT1155), які надходять на
-гаманець гравця.
-Для створення предмета (ItemNFT721) через крафт, гравець повинен мати
-необхідну кількість ресурсів.
-Під час крафту:
-Ресурси спалюються.
-Створюється предмет (NFT721) з унікальним ID.
-Створені предмети можна:
-продавати на Marketplace,
-або передавати іншим гравцям.
-Механіка Marketplace:
-Гравці можуть продавати предмети (NFT721) за MagicToken.
-Після купівлі предмета:
-NFT спалюється.
-Продавець отримує відповідну кількість MagicToken на свій гаманець.
-Контракти:
-ResourceNFT1155
-ItemNFT721 (2-4шт)
-Crafting/Search
-Marketplace
-MagicToken (ERC20)
+# Cossack Business Game - Whitechain Testnet
+
+## Compile result
+
+![compile result](image.png)
+
+## Test
+
+```
+> whitechain-cossack-business@1.0.0 test
+> hardhat test
+
+  CraftingContract
+    Deployment
+      ✔ Should deploy with correct initial state (610ms)
+      ✔ Should revert if initialized with zero address for resource contract
+      ✔ Should revert if initialized with zero address for item contract
+    Craft Cossack Saber
+      ✔ Should craft Cossack saber with correct resources
+      ✔ Should emit ItemCrafted event
+      ✔ Should revert if insufficient resources
+    Craft Elder's Staff
+      ✔ Should craft Elder's staff with correct resources
+      ✔ Should revert if insufficient resources
+    Craft Character Armor
+      ✔ Should craft Character armor with correct resources
+    Craft Combat Bracelet
+      ✔ Should craft Combat bracelet with correct resources
+    Access Control
+      ✔ Should allow admin to set contracts (38ms)
+      ✔ Should revert if non-admin tries to set contracts
+    Upgradeability
+      ✔ Should upgrade contract
+
+  Integration Tests
+    Complete Game Flow
+      ✔ Should allow player to search for resources and craft Cossack saber (112ms)
+      ✔ Should allow player to craft multiple items
+      ✔ Should prevent crafting without sufficient resources
+      ✔ Should allow multiple players to search and craft independently
+
+  ItemContract
+    Deployment
+      ✔ Should deploy with correct initial state
+      ✔ Should have correct item constants
+    Access Control
+      ✔ Should grant MINTER_ROLE
+      ✔ Should revert if non-admin tries to grant role
+    Minting
+      ✔ Should mint items with MINTER_ROLE
+      ✔ Should emit ItemMinted event
+      ✔ Should revert if caller doesn't have MINTER_ROLE
+      ✔ Should revert if item ID is invalid (0)
+      ✔ Should revert if item ID is invalid (>4)
+      ✔ Should revert if minting to zero address
+      ✔ Should mint multiple items with sequential token IDs
+      ✔ Should track item types correctly
+    Validation
+      ✔ Should validate item IDs correctly
+    Interface Support
+      ✔ Should support ERC721 interface
+      ✔ Should support AccessControl interface
+      ✔ Should not support invalid interface
+    Upgradeability
+      ✔ Should upgrade contract
+
+  ResourceContract
+    Deployment
+      ✔ Should deploy with correct initial state
+      ✔ Should have correct resource constants
+    Access Control
+      ✔ Should grant MINTER_ROLE
+      ✔ Should grant BURNER_ROLE
+      ✔ Should revert if non-admin tries to grant role
+    Minting
+      ✔ Should mint resources with MINTER_ROLE
+      ✔ Should emit ResourceMinted event
+      ✔ Should revert if caller doesn't have MINTER_ROLE
+      ✔ Should revert if resource ID is invalid (0)
+      ✔ Should revert if resource ID is invalid (>6)
+      ✔ Should revert if minting to zero address
+      ✔ Should revert if amount is zero
+      ✔ Should mint multiple resource types
+    Burning
+      ✔ Should burn resources with BURNER_ROLE
+      ✔ Should emit ResourceBurned event
+      ✔ Should revert if caller doesn't have BURNER_ROLE
+      ✔ Should revert if resource ID is invalid
+      ✔ Should revert if burning from zero address
+      ✔ Should revert if amount is zero
+    Validation
+      ✔ Should validate resource IDs correctly
+    Interface Support
+      ✔ Should support ERC1155 interface
+      ✔ Should support AccessControl interface
+      ✔ Should not support invalid interface
+    Upgradeability
+      ✔ Should upgrade contract
+      ✔ Should revert if non-admin tries to upgrade
+
+  SearchContract
+    Deployment
+      ✔ Should deploy with correct initial state
+      ✔ Should revert if initialized with zero address
+    Search Functionality
+      ✔ Should mint a random resource when searching
+      ✔ Should emit ResourceFound event
+      ✔ Should mint exactly 1 resource per search
+      ✔ Should mint valid resource IDs (1-6)
+    Access Control
+      ✔ Should allow admin to set resource contract
+      ✔ Should revert if non-admin tries to set resource contract
+      ✔ Should revert if setting resource contract to zero address
+    Upgradeability
+      ✔ Should upgrade contract
+
+
+  69 passing (1s)
+```
+
+## Coverage
+
+![alt text](image-1.png)
+
+## Deployment
+
+![alt text](image-2.png)
+
+[Example contract verification](https://testnet.whitechain.io/address/0x4e0F2aD2329E9cE52d595B8Bbb6Ae33682D1FbdA/contract)
+
